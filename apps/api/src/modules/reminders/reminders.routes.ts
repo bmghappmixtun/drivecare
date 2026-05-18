@@ -1,9 +1,9 @@
-import { getMaintenanceUrgency } from "@drivecare/shared";
 import { Router } from "express";
 import { prisma } from "../../db/prisma.js";
 import { requireAuth } from "../../middleware/auth.js";
 import { asyncHandler } from "../../utils/async-handler.js";
 import { ok } from "../../utils/http.js";
+import { getMaintenanceUrgency } from "../../utils/maintenance-rules.js";
 
 export const remindersRouter = Router();
 remindersRouter.use(requireAuth);
@@ -19,7 +19,11 @@ remindersRouter.get(
 
     return ok(
       res,
-      reminders.map((reminder) => ({
+      reminders.map((reminder: {
+        vehicle: { currentMileage: number };
+        dueMileage: number | null;
+        dueDate: Date | null;
+      }) => ({
         ...reminder,
         urgency: getMaintenanceUrgency({
           currentMileage: reminder.vehicle.currentMileage,

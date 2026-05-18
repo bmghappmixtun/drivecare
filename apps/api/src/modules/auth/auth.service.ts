@@ -1,5 +1,6 @@
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
+import type { Secret, SignOptions } from "jsonwebtoken";
 import { nanoid } from "nanoid";
 import { env } from "../../config/env.js";
 import { prisma } from "../../db/prisma.js";
@@ -60,8 +61,8 @@ export async function refresh(refreshToken: string) {
 async function issueSession(user: { id: string; email: string; role: "USER" | "ADMIN" }) {
   const accessToken = jwt.sign(
     { id: user.id, email: user.email, role: user.role },
-    env.JWT_ACCESS_SECRET,
-    { expiresIn: env.ACCESS_TOKEN_TTL }
+    env.JWT_ACCESS_SECRET as Secret,
+    { expiresIn: env.ACCESS_TOKEN_TTL as SignOptions["expiresIn"] }
   );
   const refreshToken = nanoid(64);
   const tokenHash = await bcrypt.hash(refreshToken, 12);

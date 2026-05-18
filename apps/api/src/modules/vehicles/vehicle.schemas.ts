@@ -1,5 +1,5 @@
-import { TRANSMISSION_TYPES, VEHICLE_FUEL_TYPES } from "@drivecare/shared";
 import { z } from "zod";
+import { TRANSMISSION_TYPES, VEHICLE_FUEL_TYPES } from "../../utils/maintenance-rules.js";
 
 export const vehicleCreateSchema = z.object({
   brand: z.string().min(1),

@@ -1,6 +1,6 @@
-import { calculateNextMaintenance } from "@drivecare/shared";
 import { prisma } from "../../db/prisma.js";
 import { HttpError } from "../../utils/http.js";
+import { calculateNextMaintenance } from "../../utils/maintenance-rules.js";
 import type { maintenanceCreateSchema, maintenanceQuerySchema } from "./maintenance.schemas.js";
 import type { z } from "zod";
 
@@ -14,7 +14,7 @@ export async function createMaintenance(userId: string, input: z.infer<typeof ma
     mileage: input.mileage
   });
 
-  return prisma.$transaction(async (tx) => {
+  return prisma.$transaction(async (tx: typeof prisma) => {
     const record = await tx.maintenanceRecord.create({
       data: {
         userId,
@@ -81,11 +81,14 @@ export async function getMaintenanceStats(userId: string) {
     prisma.reminder.count({ where: { userId, status: "planned" } })
   ]);
 
-  const annualCost = expenses
-    .filter((expense) => expense.spentAt.getFullYear() === new Date().getFullYear())
-    .reduce((sum, expense) => sum + Number(expense.amount), 0);
+  type ExpenseRow = { spentAt: Date; amount: unknown };
+  const expenseRows = expenses as ExpenseRow[];
 
-  const monthlyCost = expenses.reduce<Record<string, number>>((acc, expense) => {
+  const annualCost = expenseRows
+    .filter((expense: ExpenseRow) => expense.spentAt.getFullYear() === new Date().getFullYear())
+    .reduce((sum: number, expense: ExpenseRow) => sum + Number(expense.amount), 0);
+
+  const monthlyCost = expenseRows.reduce<Record<string, number>>((acc: Record<string, number>, expense: ExpenseRow) => {
     const key = expense.spentAt.toISOString().slice(0, 7);
     acc[key] = (acc[key] ?? 0) + Number(expense.amount);
     return acc;

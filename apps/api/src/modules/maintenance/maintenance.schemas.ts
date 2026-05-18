@@ -1,5 +1,5 @@
-import { MAINTENANCE_CATEGORIES } from "@drivecare/shared";
 import { z } from "zod";
+import { MAINTENANCE_CATEGORIES } from "../../utils/maintenance-rules.js";
 
 export const maintenanceCreateSchema = z.object({
   vehicleId: z.string().min(1),
