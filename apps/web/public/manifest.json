@@ -1,0 +1,9 @@
+{
+  "name": "DriveCare",
+  "short_name": "DriveCare",
+  "start_url": "/dashboard",
+  "display": "standalone",
+  "background_color": "#080A0F",
+  "theme_color": "#1463FF",
+  "icons": []
+}

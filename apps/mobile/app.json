@@ -1,0 +1,21 @@
+{
+  "expo": {
+    "name": "DriveCare",
+    "slug": "drivecare",
+    "version": "0.1.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "automatic",
+    "assetBundlePatterns": ["**/*"],
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "app.drivecare.mobile"
+    },
+    "android": {
+      "package": "app.drivecare.mobile",
+      "adaptiveIcon": {
+        "backgroundColor": "#1463FF"
+      }
+    },
+    "plugins": ["expo-notifications"]
+  }
+}

@@ -1,0 +1,6 @@
+{
+  "buildCommand": "npm run build --workspace @drivecare/web",
+  "installCommand": "npm install --workspace @drivecare/web --include-workspace-root",
+  "outputDirectory": "apps/web/.next",
+  "framework": "nextjs"
+}

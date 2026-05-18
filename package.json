@@ -1,0 +1,26 @@
+{
+  "name": "drivecare",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Monorepo production-ready pour une application de gestion d'entretien automobile.",
+  "packageManager": "npm@10.8.2",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "npm run dev --workspace @drivecare/api",
+    "dev:api": "npm run dev --workspace @drivecare/api",
+    "dev:web": "npm run dev --workspace @drivecare/web",
+    "dev:mobile": "npm run dev --workspace @drivecare/mobile",
+    "build": "npm run build --workspaces --if-present",
+    "lint": "npm run lint --workspaces --if-present",
+    "test": "npm run test --workspaces --if-present",
+    "format": "prettier --write ."
+  },
+  "devDependencies": {
+    "@types/node": "^20.14.10",
+    "prettier": "^3.3.3",
+    "typescript": "^5.5.4"
+  }
+}

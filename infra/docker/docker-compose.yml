@@ -1,0 +1,35 @@
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: drivecare-db
+    environment:
+      POSTGRES_USER: drivecare
+      POSTGRES_PASSWORD: drivecare
+      POSTGRES_DB: drivecare
+    ports:
+      - "5432:5432"
+    volumes:
+      - ../../postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U drivecare"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  api:
+    build:
+      context: ../..
+      dockerfile: apps/api/Dockerfile
+    container_name: drivecare-api
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      NODE_ENV: production
+      PORT: 4000
+      DATABASE_URL: postgresql://drivecare:drivecare@db:5432/drivecare
+      JWT_ACCESS_SECRET: change-me-access-secret-prod
+      JWT_REFRESH_SECRET: change-me-refresh-secret-prod
+      WEB_ORIGIN: http://localhost:3000
+    ports:
+      - "4000:4000"
