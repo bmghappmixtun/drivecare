@@ -17,7 +17,18 @@ import { vehiclesRouter } from "./modules/vehicles/vehicles.routes.js";
 export function createApp() {
   const app = express();
   app.use(helmet());
-  app.use(cors({ origin: env.WEB_ORIGIN, credentials: true }));
+  app.use(
+    cors({
+      origin(origin, callback) {
+        if (!origin) return callback(null, true);
+        const allowedOrigins = env.WEB_ORIGIN.split(",").map((item) => item.trim());
+        const isAllowedVercelPreview = /^https:\/\/[a-z0-9-]+\.vercel\.app$/i.test(origin);
+        if (allowedOrigins.includes(origin) || isAllowedVercelPreview) return callback(null, true);
+        return callback(null, false);
+      },
+      credentials: true
+    })
+  );
   app.use(express.json({ limit: "1mb" }));
   app.use(morgan(env.NODE_ENV === "production" ? "combined" : "dev"));
   app.use(rateLimit({ windowMs: 60_000, limit: 120, standardHeaders: true }));

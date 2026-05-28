@@ -1,15 +1,27 @@
+"use client";
+
+import { AuthGuard } from "../../components/auth/auth-guard";
 import { AppShell } from "../../components/app-shell";
 import { PageHeader } from "../../components/page-header";
+import { type AuthSession } from "../../lib/api";
 
 export default function SettingsPage() {
+  return <AuthGuard>{(session) => <SettingsContent session={session} />}</AuthGuard>;
+}
+
+function SettingsContent({ session }: { session: AuthSession }) {
   return (
     <AppShell>
       <PageHeader eyebrow="Compte" title="Profil et preferences" />
       <section className="card">
         <div className="form-grid">
           <div className="field">
-            <label>Prenom</label>
-            <input defaultValue="Nadia" />
+            <label>Email</label>
+            <input readOnly value={session.user.email} />
+          </div>
+          <div className="field">
+            <label>Role</label>
+            <input readOnly value={session.user.role} />
           </div>
           <div className="field">
             <label>Langue</label>
@@ -24,14 +36,6 @@ export default function SettingsPage() {
             <select defaultValue="all">
               <option value="all">Push + email + in-app</option>
               <option value="critical">Critiques seulement</option>
-            </select>
-          </div>
-          <div className="field">
-            <label>Theme</label>
-            <select defaultValue="system">
-              <option value="system">Systeme</option>
-              <option value="light">Clair</option>
-              <option value="dark">Sombre</option>
             </select>
           </div>
         </div>

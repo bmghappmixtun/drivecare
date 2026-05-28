@@ -1,9 +1,10 @@
 "use client";
 
 import { APP_CONFIG } from "@drivecare/shared";
-import { BarChart3, Bell, Car, Gauge, History, Settings, Shield, Wrench } from "lucide-react";
+import { BarChart3, Bell, Car, Gauge, LogOut, Settings, Shield, Wrench } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { clearStoredSession, getStoredSession } from "../lib/api";
 
 const nav = [
   { href: "/dashboard", label: "Dashboard", icon: Gauge },
@@ -16,6 +17,7 @@ const nav = [
 
 export function AppShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
+  const session = typeof window !== "undefined" ? getStoredSession() : null;
   return (
     <div className="shell">
       <aside className="sidebar">
@@ -41,6 +43,19 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           <p className="muted">Cout annuel estime</p>
           <strong>1 248 EUR</strong>
         </div>
+        {session ? (
+          <button
+            className="btn"
+            style={{ marginTop: 12, width: "100%" }}
+            type="button"
+            onClick={() => {
+              clearStoredSession();
+              window.location.href = "/login";
+            }}
+          >
+            <LogOut size={17} /> Deconnexion
+          </button>
+        ) : null}
       </aside>
       <main className="content">{children}</main>
     </div>

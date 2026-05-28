@@ -154,6 +154,11 @@ h1 {
   color: white;
 }
 
+.btn:disabled {
+  opacity: 0.65;
+  cursor: wait;
+}
+
 .grid {
   display: grid;
   gap: 16px;
@@ -257,6 +262,29 @@ h1 {
   padding: 0 12px;
   background: var(--bg);
   color: var(--ink);
+}
+
+.auth-screen {
+  display: grid;
+  place-items: center;
+  min-height: 100vh;
+  padding: 24px;
+}
+
+.auth-card {
+  width: min(460px, 100%);
+  display: grid;
+  gap: 14px;
+}
+
+.auth-brand {
+  margin-bottom: 8px;
+}
+
+.form-error {
+  margin: 0;
+  color: var(--danger);
+  font-weight: 700;
 }
 
 @media (max-width: 900px) {
