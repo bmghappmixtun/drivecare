@@ -4,7 +4,9 @@ import rateLimit from "express-rate-limit";
 import helmet from "helmet";
 import morgan from "morgan";
 import { env } from "./config/env.js";
+import { prisma } from "./db/prisma.js";
 import { errorHandler } from "./middleware/error-handler.js";
+import { asyncHandler } from "./utils/async-handler.js";
 import { adminRouter } from "./modules/admin/admin.routes.js";
 import { aiRouter } from "./modules/ai/ai.routes.js";
 import { authRouter } from "./modules/auth/auth.routes.js";
@@ -36,6 +38,14 @@ export function createApp() {
   app.get("/health", (_req, res) => {
     res.json({ status: "ok", service: "drivecare-api" });
   });
+
+  app.get(
+    "/health/db",
+    asyncHandler(async (_req, res) => {
+      const users = await prisma.user.count();
+      res.json({ status: "ok", database: "connected", users });
+    })
+  );
 
   app.use("/auth", authRouter);
   app.use("/vehicles", vehiclesRouter);

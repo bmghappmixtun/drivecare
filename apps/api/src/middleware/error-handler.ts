@@ -4,6 +4,7 @@ import { toHttpError } from "../utils/http.js";
 export function errorHandler(error: unknown, req: Request, res: Response, _next: NextFunction) {
   const httpError = toHttpError(error);
   if (httpError.status >= 500) {
+    console.error(error);
     req.app.emit("error", error);
   }
 
