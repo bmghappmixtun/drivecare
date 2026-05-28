@@ -45,7 +45,19 @@ export async function apiRequest<T>(path: string, init: RequestInit, token?: str
 
   if (!response.ok) {
     const text = await response.text();
-    throw new Error(text || `API request failed: ${response.status}`);
+    try {
+      const payload = JSON.parse(text) as { error?: { message?: string; details?: { fieldErrors?: Record<string, string[]> } } };
+      const fieldErrors = payload.error?.details?.fieldErrors;
+      const firstFieldError = fieldErrors
+        ? Object.values(fieldErrors)
+            .flat()
+            .find(Boolean)
+        : null;
+      throw new Error(firstFieldError || payload.error?.message || `API request failed: ${response.status}`);
+    } catch (error) {
+      if (error instanceof Error && error.message !== text) throw error;
+      throw new Error(text || `API request failed: ${response.status}`);
+    }
   }
 
   const payload = (await response.json()) as { data: T };

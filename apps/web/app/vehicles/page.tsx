@@ -46,6 +46,7 @@ function VehiclesContent({ session }: { session: AuthSession }) {
     setMessage("");
     setSaving(true);
     const form = new FormData(event.currentTarget);
+    const licensePlate = String(form.get("licensePlate") || "").trim();
 
     try {
       await apiPost<Vehicle>(
@@ -54,7 +55,7 @@ function VehiclesContent({ session }: { session: AuthSession }) {
           brand: String(form.get("brand")),
           model: String(form.get("model")),
           year: Number(form.get("year")),
-          licensePlate: String(form.get("licensePlate") || ""),
+          ...(licensePlate ? { licensePlate } : {}),
           currentMileage: Number(form.get("currentMileage")),
           fuelType: String(form.get("fuelType")),
           transmission: String(form.get("transmission"))
@@ -63,9 +64,13 @@ function VehiclesContent({ session }: { session: AuthSession }) {
       );
       event.currentTarget.reset();
       setMessage("Vehicule ajoute.");
-      await loadVehicles();
-    } catch {
-      setMessage("Impossible d'ajouter le vehicule.");
+      try {
+        await loadVehicles();
+      } catch {
+        setMessage("Vehicule ajoute. Actualisez la liste si elle ne se met pas a jour.");
+      }
+    } catch (error) {
+      setMessage(error instanceof Error ? error.message : "Impossible d'ajouter le vehicule.");
     } finally {
       setSaving(false);
     }
