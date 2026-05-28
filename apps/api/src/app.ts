@@ -39,13 +39,16 @@ export function createApp() {
     res.json({ status: "ok", service: "drivecare-api" });
   });
 
-  app.get(
-    "/health/db",
-    asyncHandler(async (_req, res) => {
+  app.get("/health/db", async (_req, res) => {
+    try {
       const users = await prisma.user.count();
       res.json({ status: "ok", database: "connected", users });
-    })
-  );
+    } catch (error) {
+      console.error(error);
+      const message = error instanceof Error ? sanitizeDiagnosticMessage(error.message) : "Unknown database error";
+      res.status(500).json({ status: "error", database: "unavailable", message });
+    }
+  });
 
   app.use("/auth", authRouter);
   app.use("/vehicles", vehiclesRouter);
@@ -58,4 +61,10 @@ export function createApp() {
   app.use(errorHandler);
 
   return app;
+}
+
+function sanitizeDiagnosticMessage(message: string) {
+  return message
+    .replace(/postgresql:\/\/[^@\s]+@/g, "postgresql://***@")
+    .replace(/password=[^&\s]+/gi, "password=***");
 }
