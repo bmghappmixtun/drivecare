@@ -5,6 +5,7 @@ import { FileUp, Plus, RefreshCw } from "lucide-react";
 import { FormEvent, useEffect, useState } from "react";
 import { AuthGuard } from "../../components/auth/auth-guard";
 import { AppShell } from "../../components/app-shell";
+import { FieldLabel, FormAlert } from "../../components/form";
 import { PageHeader } from "../../components/page-header";
 import { apiGet, apiPost, type AuthSession } from "../../lib/api";
 
@@ -19,6 +20,7 @@ type MaintenanceRecord = {
   cost: string | number;
   garageName?: string | null;
 };
+type Feedback = { tone: "success" | "error" | "info"; text: string };
 
 export default function MaintenancePage() {
   return <AuthGuard>{(session) => <MaintenanceContent session={session} />}</AuthGuard>;
@@ -29,7 +31,7 @@ function MaintenanceContent({ session }: { session: AuthSession }) {
   const [history, setHistory] = useState<MaintenanceRecord[]>([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-  const [message, setMessage] = useState("");
+  const [feedback, setFeedback] = useState<Feedback | null>(null);
 
   async function load() {
     setLoading(true);
@@ -52,7 +54,7 @@ function MaintenanceContent({ session }: { session: AuthSession }) {
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setSaving(true);
-    setMessage("");
+    setFeedback(null);
     const form = new FormData(event.currentTarget);
     const performedAt = `${String(form.get("performedAt"))}T00:00:00.000Z`;
 
@@ -72,10 +74,20 @@ function MaintenanceContent({ session }: { session: AuthSession }) {
         session.accessToken
       );
       event.currentTarget.reset();
-      setMessage("Entretien ajoute et prochain rappel calcule.");
-      await load();
-    } catch {
-      setMessage("Impossible d'ajouter l'entretien.");
+      setFeedback({ tone: "success", text: "Entretien enregistre avec succes. Le prochain rappel a ete calcule." });
+      try {
+        await load();
+      } catch {
+        setFeedback({
+          tone: "info",
+          text: "Entretien enregistre avec succes. Actualisez la liste si elle ne se met pas a jour."
+        });
+      }
+    } catch (error) {
+      setFeedback({
+        tone: "error",
+        text: error instanceof Error ? error.message : "Impossible d'ajouter l'entretien."
+      });
     } finally {
       setSaving(false);
     }
@@ -100,7 +112,7 @@ function MaintenanceContent({ session }: { session: AuthSession }) {
                   <div>
                     <strong>{item.customCategory || item.category}</strong>
                     <div className="muted">
-                      {vehicle ? `${vehicle.brand} ${vehicle.model}` : "Vehicule"} · {item.performedAt.slice(0, 10)} ·{" "}
+                      {vehicle ? `${vehicle.brand} ${vehicle.model}` : "Vehicule"} - {item.performedAt.slice(0, 10)} -{" "}
                       {item.mileage.toLocaleString("fr-FR")} km
                     </div>
                   </div>
@@ -114,7 +126,7 @@ function MaintenanceContent({ session }: { session: AuthSession }) {
           <h2>Nouvelle intervention</h2>
           <div className="form-grid">
             <div className="field">
-              <label>Vehicule</label>
+              <FieldLabel required>Vehicule</FieldLabel>
               <select name="vehicleId" required>
                 <option value="">Choisir</option>
                 {vehicles.map((vehicle) => (
@@ -125,8 +137,8 @@ function MaintenanceContent({ session }: { session: AuthSession }) {
               </select>
             </div>
             <div className="field">
-              <label>Categorie</label>
-              <select name="category" defaultValue="oil_change">
+              <FieldLabel required>Categorie</FieldLabel>
+              <select name="category" defaultValue="oil_change" required>
                 {MAINTENANCE_CATEGORIES.map((category) => (
                   <option key={category} value={category}>
                     {category}
@@ -135,27 +147,27 @@ function MaintenanceContent({ session }: { session: AuthSession }) {
               </select>
             </div>
             <div className="field">
-              <label>Cout</label>
+              <FieldLabel>Cout</FieldLabel>
               <input name="cost" type="number" min="0" placeholder="120" />
             </div>
             <div className="field">
-              <label>Date</label>
+              <FieldLabel required>Date</FieldLabel>
               <input name="performedAt" type="date" required />
             </div>
             <div className="field">
-              <label>Kilometrage</label>
+              <FieldLabel required>Kilometrage</FieldLabel>
               <input name="mileage" type="number" min="0" placeholder="52000" required />
             </div>
             <div className="field">
-              <label>Garage</label>
+              <FieldLabel>Garage</FieldLabel>
               <input name="garageName" placeholder="Garage Central" />
             </div>
           </div>
           <div className="field" style={{ marginTop: 12 }}>
-            <label>Notes</label>
+            <FieldLabel>Notes</FieldLabel>
             <textarea name="notes" rows={4} />
           </div>
-          {message ? <p className="muted">{message}</p> : null}
+          {feedback ? <FormAlert tone={feedback.tone}>{feedback.text}</FormAlert> : null}
           <div className="actions" style={{ marginTop: 12 }}>
             <button className="btn" type="button">
               <FileUp size={17} /> Facture

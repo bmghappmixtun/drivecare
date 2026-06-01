@@ -5,6 +5,7 @@ import { Car } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { FormEvent, useState } from "react";
+import { FieldLabel, FormAlert } from "../../components/form";
 import { apiPost, setStoredSession, type AuthSession } from "../../lib/api";
 
 export default function LoginPage() {
@@ -44,14 +45,14 @@ export default function LoginPage() {
         <h1>Connexion</h1>
         <p className="muted">Accedez a vos vehicules, rappels et historiques.</p>
         <div className="field">
-          <label>Email</label>
+          <FieldLabel required>Email</FieldLabel>
           <input name="email" type="email" required placeholder="vous@example.com" />
         </div>
         <div className="field">
-          <label>Mot de passe</label>
+          <FieldLabel required>Mot de passe</FieldLabel>
           <input name="password" type="password" required placeholder="Votre mot de passe" />
         </div>
-        {error ? <p className="form-error">{error}</p> : null}
+        {error ? <FormAlert tone="error">{error}</FormAlert> : null}
         <button className="btn primary" disabled={loading} type="submit">
           {loading ? "Connexion..." : "Se connecter"}
         </button>

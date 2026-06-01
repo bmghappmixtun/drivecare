@@ -4,6 +4,7 @@ import { Camera, Plus, RefreshCw } from "lucide-react";
 import { FormEvent, useEffect, useState } from "react";
 import { AuthGuard } from "../../components/auth/auth-guard";
 import { AppShell } from "../../components/app-shell";
+import { FieldLabel, FormAlert } from "../../components/form";
 import { PageHeader } from "../../components/page-header";
 import { apiGet, apiPost, type AuthSession } from "../../lib/api";
 
@@ -18,6 +19,8 @@ type Vehicle = {
   transmission: string;
 };
 
+type Feedback = { tone: "success" | "error" | "info"; text: string };
+
 export default function VehiclesPage() {
   return <AuthGuard>{(session) => <VehiclesContent session={session} />}</AuthGuard>;
 }
@@ -26,7 +29,7 @@ function VehiclesContent({ session }: { session: AuthSession }) {
   const [vehicles, setVehicles] = useState<Vehicle[]>([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-  const [message, setMessage] = useState("");
+  const [feedback, setFeedback] = useState<Feedback | null>(null);
 
   async function loadVehicles() {
     setLoading(true);
@@ -43,7 +46,7 @@ function VehiclesContent({ session }: { session: AuthSession }) {
 
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    setMessage("");
+    setFeedback(null);
     setSaving(true);
     const form = new FormData(event.currentTarget);
     const licensePlate = String(form.get("licensePlate") || "").trim();
@@ -63,14 +66,20 @@ function VehiclesContent({ session }: { session: AuthSession }) {
         session.accessToken
       );
       event.currentTarget.reset();
-      setMessage("Vehicule ajoute.");
+      setFeedback({ tone: "success", text: "Vehicule enregistre avec succes." });
       try {
         await loadVehicles();
       } catch {
-        setMessage("Vehicule ajoute. Actualisez la liste si elle ne se met pas a jour.");
+        setFeedback({
+          tone: "info",
+          text: "Vehicule enregistre avec succes. Actualisez la liste si elle ne se met pas a jour."
+        });
       }
     } catch (error) {
-      setMessage(error instanceof Error ? error.message : "Impossible d'ajouter le vehicule.");
+      setFeedback({
+        tone: "error",
+        text: error instanceof Error ? error.message : "Impossible d'ajouter le vehicule."
+      });
     } finally {
       setSaving(false);
     }
@@ -99,7 +108,7 @@ function VehiclesContent({ session }: { session: AuthSession }) {
                       {vehicle.brand} {vehicle.model}
                     </strong>
                     <div className="muted">
-                      {vehicle.year} · {vehicle.licensePlate || "Sans immatriculation"} ·{" "}
+                      {vehicle.year} - {vehicle.licensePlate || "Sans immatriculation"} -{" "}
                       {vehicle.currentMileage.toLocaleString("fr-FR")} km
                     </div>
                   </div>
@@ -113,28 +122,28 @@ function VehiclesContent({ session }: { session: AuthSession }) {
           <h2>Ajouter rapidement</h2>
           <div className="form-grid">
             <div className="field">
-              <label>Marque</label>
+              <FieldLabel required>Marque</FieldLabel>
               <input name="brand" placeholder="Peugeot" required />
             </div>
             <div className="field">
-              <label>Modele</label>
+              <FieldLabel required>Modele</FieldLabel>
               <input name="model" placeholder="3008" required />
             </div>
             <div className="field">
-              <label>Annee</label>
+              <FieldLabel required>Annee</FieldLabel>
               <input name="year" type="number" min="1950" placeholder="2022" required />
             </div>
             <div className="field">
-              <label>Kilometrage</label>
+              <FieldLabel required>Kilometrage</FieldLabel>
               <input name="currentMileage" type="number" min="0" placeholder="42500" required />
             </div>
             <div className="field">
-              <label>Immatriculation</label>
+              <FieldLabel>Immatriculation</FieldLabel>
               <input name="licensePlate" placeholder="123 TU 456" />
             </div>
             <div className="field">
-              <label>Carburant</label>
-              <select name="fuelType" defaultValue="gasoline">
+              <FieldLabel required>Carburant</FieldLabel>
+              <select name="fuelType" defaultValue="gasoline" required>
                 <option value="gasoline">Essence</option>
                 <option value="diesel">Diesel</option>
                 <option value="hybrid">Hybride</option>
@@ -144,8 +153,8 @@ function VehiclesContent({ session }: { session: AuthSession }) {
               </select>
             </div>
             <div className="field">
-              <label>Transmission</label>
-              <select name="transmission" defaultValue="manual">
+              <FieldLabel required>Transmission</FieldLabel>
+              <select name="transmission" defaultValue="manual" required>
                 <option value="manual">Manuelle</option>
                 <option value="automatic">Automatique</option>
                 <option value="cvt">CVT</option>
@@ -153,7 +162,7 @@ function VehiclesContent({ session }: { session: AuthSession }) {
               </select>
             </div>
           </div>
-          {message ? <p className="muted">{message}</p> : null}
+          {feedback ? <FormAlert tone={feedback.tone}>{feedback.text}</FormAlert> : null}
           <div className="actions" style={{ marginTop: 12 }}>
             <button className="btn" type="button">
               <Camera size={17} /> Photo

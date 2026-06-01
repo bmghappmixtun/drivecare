@@ -250,6 +250,7 @@ h1 {
 .field label {
   color: var(--muted);
   font-size: 13px;
+  font-weight: 700;
 }
 
 .field input,
@@ -285,6 +286,39 @@ h1 {
   margin: 0;
   color: var(--danger);
   font-weight: 700;
+}
+
+.required-mark {
+  margin-left: 4px;
+  color: var(--danger);
+  font-weight: 900;
+}
+
+.form-alert {
+  margin-top: 12px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 10px 12px;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.form-alert.success {
+  color: var(--ok);
+  background: color-mix(in srgb, var(--ok) 10%, transparent);
+  border-color: color-mix(in srgb, var(--ok) 25%, var(--line));
+}
+
+.form-alert.error {
+  color: var(--danger);
+  background: color-mix(in srgb, var(--danger) 9%, transparent);
+  border-color: color-mix(in srgb, var(--danger) 25%, var(--line));
+}
+
+.form-alert.info {
+  color: var(--blue);
+  background: color-mix(in srgb, var(--blue) 9%, transparent);
+  border-color: color-mix(in srgb, var(--blue) 25%, var(--line));
 }
 
 @media (max-width: 900px) {

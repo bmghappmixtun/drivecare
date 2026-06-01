@@ -5,6 +5,7 @@ import { Car } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { FormEvent, useState } from "react";
+import { FieldLabel, FormAlert } from "../../components/form";
 import { apiPost, setStoredSession, type AuthSession } from "../../lib/api";
 
 export default function RegisterPage() {
@@ -47,23 +48,23 @@ export default function RegisterPage() {
         <h1>Creer un compte</h1>
         <div className="form-grid">
           <div className="field">
-            <label>Prenom</label>
+            <FieldLabel required>Prenom</FieldLabel>
             <input name="firstName" required placeholder="Mehdi" />
           </div>
           <div className="field">
-            <label>Nom</label>
+            <FieldLabel required>Nom</FieldLabel>
             <input name="lastName" required placeholder="Boutiti" />
           </div>
         </div>
         <div className="field">
-          <label>Email</label>
+          <FieldLabel required>Email</FieldLabel>
           <input name="email" type="email" required placeholder="vous@example.com" />
         </div>
         <div className="field">
-          <label>Mot de passe</label>
+          <FieldLabel required>Mot de passe</FieldLabel>
           <input name="password" type="password" minLength={8} required placeholder="8 caracteres minimum" />
         </div>
-        {error ? <p className="form-error">{error}</p> : null}
+        {error ? <FormAlert tone="error">{error}</FormAlert> : null}
         <button className="btn primary" disabled={loading} type="submit">
           {loading ? "Creation..." : "Creer mon compte"}
         </button>
