@@ -1,7 +1,8 @@
 "use client";
 
+import { VEHICLE_BRANDS, getVehicleModels } from "@drivecare/shared";
 import { Camera, Plus, RefreshCw } from "lucide-react";
-import { FormEvent, useEffect, useState } from "react";
+import { FormEvent, useEffect, useMemo, useState } from "react";
 import { AuthGuard } from "../../components/auth/auth-guard";
 import { AppShell } from "../../components/app-shell";
 import { FieldLabel, FormAlert } from "../../components/form";
@@ -30,6 +31,9 @@ function VehiclesContent({ session }: { session: AuthSession }) {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [feedback, setFeedback] = useState<Feedback | null>(null);
+  const [brand, setBrand] = useState("");
+  const [model, setModel] = useState("");
+  const modelSuggestions = useMemo(() => getVehicleModels(brand), [brand]);
 
   async function loadVehicles() {
     setLoading(true);
@@ -66,6 +70,8 @@ function VehiclesContent({ session }: { session: AuthSession }) {
         session.accessToken
       );
       event.currentTarget.reset();
+      setBrand("");
+      setModel("");
       setFeedback({ tone: "success", text: "Vehicule enregistre avec succes." });
       try {
         await loadVehicles();
@@ -123,11 +129,45 @@ function VehiclesContent({ session }: { session: AuthSession }) {
           <div className="form-grid">
             <div className="field">
               <FieldLabel required>Marque</FieldLabel>
-              <input name="brand" placeholder="Peugeot" required />
+              <input
+                autoComplete="organization"
+                list="vehicle-brand-options"
+                name="brand"
+                onChange={(event) => {
+                  setBrand(event.target.value);
+                  setModel("");
+                }}
+                placeholder="Peugeot"
+                required
+                value={brand}
+              />
+              <datalist id="vehicle-brand-options">
+                {VEHICLE_BRANDS.map((item) => (
+                  <option key={item} value={item} />
+                ))}
+              </datalist>
             </div>
             <div className="field">
               <FieldLabel required>Modele</FieldLabel>
-              <input name="model" placeholder="3008" required />
+              <input
+                autoComplete="off"
+                list={modelSuggestions.length ? "vehicle-model-options" : undefined}
+                name="model"
+                onChange={(event) => setModel(event.target.value)}
+                placeholder={modelSuggestions[0] ?? "3008"}
+                required
+                value={model}
+              />
+              <datalist id="vehicle-model-options">
+                {modelSuggestions.map((item) => (
+                  <option key={item} value={item} />
+                ))}
+              </datalist>
+              <span className="field-hint">
+                {modelSuggestions.length
+                  ? `${modelSuggestions.length} modeles suggeres pour ${brand}.`
+                  : "Choisissez une marque pour afficher les modeles connus."}
+              </span>
             </div>
             <div className="field">
               <FieldLabel required>Annee</FieldLabel>
