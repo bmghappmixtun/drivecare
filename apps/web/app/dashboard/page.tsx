@@ -133,9 +133,9 @@ function DashboardContent({ session }: { session: AuthSession }) {
             <h2>Assistant IA</h2>
             <p className="muted">Analyse symptomes, couts precedents, age vehicule et historique.</p>
           </div>
-          <button className="btn primary">
+          <Link className="btn primary" href="/assistant">
             <Sparkles size={17} /> Diagnostic
-          </button>
+          </Link>
         </div>
       </section>
     </AppShell>

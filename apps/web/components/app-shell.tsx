@@ -1,7 +1,7 @@
 "use client";
 
 import { APP_CONFIG } from "@drivecare/shared";
-import { BarChart3, Bell, Car, Gauge, LogOut, Settings, Shield, Wrench } from "lucide-react";
+import { BarChart3, Bell, Car, Gauge, LogOut, Settings, Shield, Sparkles, Wrench } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { clearStoredSession, getStoredSession } from "../lib/api";
@@ -10,6 +10,7 @@ const nav = [
   { href: "/dashboard", label: "Dashboard", icon: Gauge },
   { href: "/vehicles", label: "Vehicules", icon: Car },
   { href: "/maintenance", label: "Historique", icon: Wrench },
+  { href: "/assistant", label: "Assistant", icon: Sparkles },
   { href: "/notifications", label: "Alertes", icon: Bell },
   { href: "/settings", label: "Profil", icon: Settings },
   { href: "/admin", label: "Admin", icon: Shield }
