@@ -50,9 +50,10 @@ function VehiclesContent({ session }: { session: AuthSession }) {
 
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    const formElement = event.currentTarget;
     setFeedback(null);
     setSaving(true);
-    const form = new FormData(event.currentTarget);
+    const form = new FormData(formElement);
     const licensePlate = String(form.get("licensePlate") || "").trim();
 
     try {
@@ -69,7 +70,7 @@ function VehiclesContent({ session }: { session: AuthSession }) {
         },
         session.accessToken
       );
-      event.currentTarget.reset();
+      formElement.reset();
       setBrand("");
       setModel("");
       setFeedback({ tone: "success", text: "Vehicule enregistre avec succes." });

@@ -33,16 +33,34 @@ export async function apiPatch<T>(path: string, body: unknown, token?: string): 
 }
 
 export async function apiRequest<T>(path: string, init: RequestInit, token?: string): Promise<T> {
+  const storedSession = token ? getStoredSession() : null;
+  const effectiveToken = storedSession?.accessToken ?? token;
+  const response = await fetchApi(path, init, effectiveToken);
+
+  if (response.status === 401 && token && path !== "/auth/refresh") {
+    const refreshedSession = await refreshStoredSession();
+    if (refreshedSession) {
+      const retryResponse = await fetchApi(path, init, refreshedSession.accessToken);
+      return parseApiResponse<T>(retryResponse);
+    }
+  }
+
+  return parseApiResponse<T>(response);
+}
+
+async function fetchApi(path: string, init: RequestInit, token?: string) {
   const headers = new Headers(init.headers);
   headers.set("Content-Type", "application/json");
   if (token) headers.set("Authorization", `Bearer ${token}`);
 
-  const response = await fetch(`${API_URL}${path}`, {
+  return fetch(`${API_URL}${path}`, {
     ...init,
     headers,
     cache: "no-store"
   });
+}
 
+async function parseApiResponse<T>(response: Response): Promise<T> {
   if (!response.ok) {
     const text = await response.text();
     try {
@@ -62,6 +80,28 @@ export async function apiRequest<T>(path: string, init: RequestInit, token?: str
 
   const payload = (await response.json()) as { data: T };
   return payload.data;
+}
+
+async function refreshStoredSession(): Promise<AuthSession | null> {
+  const session = getStoredSession();
+  if (!session?.refreshToken) return null;
+
+  try {
+    const response = await fetchApi(
+      "/auth/refresh",
+      {
+        method: "POST",
+        body: JSON.stringify({ refreshToken: session.refreshToken })
+      },
+      undefined
+    );
+    const refreshedSession = await parseApiResponse<AuthSession>(response);
+    setStoredSession(refreshedSession);
+    return refreshedSession;
+  } catch {
+    clearStoredSession();
+    return null;
+  }
 }
 
 export function getStoredSession(): AuthSession | null {

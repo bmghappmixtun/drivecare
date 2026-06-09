@@ -53,9 +53,10 @@ function MaintenanceContent({ session }: { session: AuthSession }) {
 
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    const formElement = event.currentTarget;
     setSaving(true);
     setFeedback(null);
-    const form = new FormData(event.currentTarget);
+    const form = new FormData(formElement);
     const performedAt = `${String(form.get("performedAt"))}T00:00:00.000Z`;
 
     try {
@@ -73,7 +74,7 @@ function MaintenanceContent({ session }: { session: AuthSession }) {
         },
         session.accessToken
       );
-      event.currentTarget.reset();
+      formElement.reset();
       setFeedback({ tone: "success", text: "Entretien enregistre avec succes. Le prochain rappel a ete calcule." });
       try {
         await load();

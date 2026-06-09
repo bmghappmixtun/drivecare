@@ -15,10 +15,11 @@ export default function RegisterPage() {
 
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    const formElement = event.currentTarget;
     setError("");
     setLoading(true);
 
-    const form = new FormData(event.currentTarget);
+    const form = new FormData(formElement);
     try {
       const session = await apiPost<AuthSession>("/auth/register", {
         firstName: String(form.get("firstName")),
