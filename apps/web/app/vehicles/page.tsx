@@ -2,6 +2,7 @@
 
 import { VEHICLE_BRANDS, getVehicleModels } from "@drivecare/shared";
 import { Camera, Plus, RefreshCw } from "lucide-react";
+import Link from "next/link";
 import { FormEvent, useEffect, useMemo, useState } from "react";
 import { AuthGuard } from "../../components/auth/auth-guard";
 import { AppShell } from "../../components/app-shell";
@@ -107,7 +108,7 @@ function VehiclesContent({ session }: { session: AuthSession }) {
               <p className="muted">Aucun vehicule pour le moment. Ajoutez votre premier vehicule.</p>
             ) : null}
             {vehicles.map((vehicle) => (
-              <article className="row" key={vehicle.id}>
+              <Link className="row vehicle-link" href={`/vehicles/${vehicle.id}`} key={vehicle.id}>
                 <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
                   <div className="vehicle-photo" />
                   <div>
@@ -121,7 +122,7 @@ function VehiclesContent({ session }: { session: AuthSession }) {
                   </div>
                 </div>
                 <span className="status ok">OK</span>
-              </article>
+              </Link>
             ))}
           </div>
         </div>

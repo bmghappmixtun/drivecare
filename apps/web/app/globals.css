@@ -204,11 +204,41 @@ h1 {
   border-radius: 8px;
 }
 
+.vehicle-link {
+  transition:
+    border-color 160ms ease,
+    transform 160ms ease;
+}
+
+.vehicle-link:hover {
+  border-color: var(--blue);
+  transform: translateY(-1px);
+}
+
 .vehicle-photo {
   width: 54px;
   height: 40px;
   border-radius: 8px;
   background: linear-gradient(135deg, #141a24, #1463ff);
+}
+
+.vehicle-photo.large {
+  width: 82px;
+  height: 62px;
+}
+
+.vehicle-detail-hero {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--panel);
+  padding: 18px;
+}
+
+.vehicle-detail-hero h2 {
+  margin: 0 0 4px;
 }
 
 .status {
