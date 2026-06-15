@@ -1,5 +1,7 @@
 export const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "https://drivecare-api-kdzf.onrender.com";
 
+const API_TIMEOUT_MS = 25_000;
+
 export type AuthSession = {
   accessToken: string;
   refreshToken: string;
@@ -53,11 +55,26 @@ async function fetchApi(path: string, init: RequestInit, token?: string) {
   headers.set("Content-Type", "application/json");
   if (token) headers.set("Authorization", `Bearer ${token}`);
 
-  return fetch(`${API_URL}${path}`, {
-    ...init,
-    headers,
-    cache: "no-store"
-  });
+  const controller = new AbortController();
+  const timeoutId = window.setTimeout(() => controller.abort(), API_TIMEOUT_MS);
+
+  try {
+    return await fetch(`${API_URL}${path}`, {
+      ...init,
+      headers,
+      cache: "no-store",
+      signal: controller.signal
+    });
+  } catch (error) {
+    if (error instanceof Error && error.name === "AbortError") {
+      throw new Error(
+        "Le serveur met trop de temps a repondre. Il est probablement en reveil sur Render gratuit. Reessayez dans quelques secondes."
+      );
+    }
+    throw error;
+  } finally {
+    window.clearTimeout(timeoutId);
+  }
 }
 
 async function parseApiResponse<T>(response: Response): Promise<T> {

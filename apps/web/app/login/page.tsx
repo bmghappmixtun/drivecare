@@ -27,8 +27,12 @@ export default function LoginPage() {
       });
       setStoredSession(session);
       router.replace("/dashboard");
-    } catch {
-      setError("Email ou mot de passe incorrect.");
+    } catch (error) {
+      if (error instanceof Error && error.message.includes("serveur met trop de temps")) {
+        setError(error.message);
+      } else {
+        setError("Email ou mot de passe incorrect.");
+      }
     } finally {
       setLoading(false);
     }
