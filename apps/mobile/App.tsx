@@ -2,7 +2,7 @@ import { NavigationContainer, DefaultTheme, DarkTheme } from "@react-navigation/
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { StatusBar } from "expo-status-bar";
 import { Bell, Car, Gauge, Settings, Wrench } from "lucide-react-native";
-import type { ComponentType } from "react";
+import type { LucideIcon } from "lucide-react-native";
 import { useColorScheme } from "react-native";
 import { DashboardScreen } from "./src/screens/DashboardScreen";
 import { VehiclesScreen } from "./src/screens/VehiclesScreen";
@@ -46,6 +46,6 @@ export default function App() {
   );
 }
 
-function icon(Icon: ComponentType<{ color: string; size: number }>) {
+function icon(Icon: LucideIcon) {
   return ({ color, size }: { color: string; size: number }) => <Icon color={color} size={size} />;
 }

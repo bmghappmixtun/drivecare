@@ -33,7 +33,7 @@ jobs:
         with:
           node-version: 20
           cache: npm
-      - run: npm install
+      - run: npm ci
       - run: npm run prisma:generate --workspace @drivecare/api
       - run: npm run lint --workspaces --if-present
       - run: npm test --workspaces --if-present

@@ -104,7 +104,7 @@ function MaintenanceContent({ session }: { session: AuthSession }) {
       <section className="grid two">
         <div className="card">
           <div className="list">
-            {loading ? <p className="muted">Chargement de l'historique...</p> : null}
+            {loading ? <p className="muted">Chargement de l&apos;historique...</p> : null}
             {!loading && history.length === 0 ? <p className="muted">Aucun entretien enregistre.</p> : null}
             {history.map((item) => {
               const vehicle = vehicles.find((row) => row.id === item.vehicleId);
